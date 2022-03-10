@@ -32,21 +32,75 @@
       </div>
     </div>
     <div class="main">
-     <div class="title"> <p>信息上报</p></div>
-      <ul>
-        <li>
-          <img src="../img/ico1.png" alt="" />
-          <p>自诊打卡</p>
-        </li>
-        <li>
-          <img src="../img/ico2.png" alt="" />
-          <p>体温上报</p>
-        </li>
-        <li>
-          <img src="../img/ico3.png" alt="" />
-          <p>行程报告</p>
-        </li>
-      </ul>
+      <div class="one">
+        <div class="title1"><p>信息上报</p></div>
+        <ul>
+          <li>
+            <img src="../img/ico11.png" alt="" @click="btn(1)" />
+            <p>自诊打卡</p>
+          </li>
+          <li>
+            <img src="../img/ico12.png" alt="" @click="btn(2)" />
+            <p>体温上报</p>
+          </li>
+          <li>
+            <img src="../img/ico13.png" alt="" @click="btn(3)" />
+            <p>行程报告</p>
+          </li>
+        </ul>
+      </div>
+      <div class="two">
+        <div class="title2"><p>活动申请</p></div>
+        <ul>
+          <li>
+            <img src="../img/ico21.png" alt="" @click="btn(4)" />
+            <p>返校申请</p>
+          </li>
+          <li>
+            <img src="../img/ico22.png" alt="" @click="btn(5)"/>
+            <p>外出申请</p>
+          </li>
+          <li>
+            <img src="../img/ico23.png" alt="" @click="btn(6)" />
+            <p>校内活动申请</p>
+          </li>
+        </ul>
+      </div>
+      <div class="three">
+        <div class="title3"><p>问卷调查</p></div>
+        <ul>
+          <li>
+            <img src="../img/ico31.png" alt="" @click="btn(7)" />
+            <p>健康码状态上报</p>
+          </li>
+          <li>
+            <img src="../img/ico32.png" alt="" @click="btn(8)" />
+            <p>核酸检测上报</p>
+          </li>
+          <li>
+            <img src="../img/ico33.png" alt="" @click="btn(9)" />
+            <p>疫苗接种上报</p>
+          </li>
+        </ul>
+      </div>
+      <div class="four">
+        <div class="title4"><p>疫情动态</p></div>
+        <ul>
+          <li>
+            <img src="../img/ico41.png" alt="" @click="btn(10)" />
+            <p>风险地区查询</p>
+          </li>
+          <li>
+            <img src="../img/ico42.png" alt="" @click="btn(11)" />
+            <p>医疗机构查询</p>
+          </li>
+          <li>
+            <img src="../img/ico43.png" alt="" @click="btn(12)" />
+            <p>核酸检测机构</p>
+          </li>
+        </ul>
+      </div>
+      <div class="btootm"></div>
     </div>
   </div>
 </template>
@@ -64,6 +118,33 @@ export default {
   methods: {
     gomap() {
       this.$router.push("/covmap");
+    },
+    btn(value) {
+      if (value == 1) {
+        this.$router.push("/Calendar");
+      } else if (value == 2) {
+        this.$router.push("/Temp");
+      } else if (value == 3) {
+        this.$router.push("/Reporter");
+      } else if (value == 4) {
+        this.$router.push("/BackSchool");
+    } else if (value == 5) {
+        this.$router.push("/Out");
+      } else if (value == 6) {
+        this.$router.push("/Activity");
+      } else if (value == 7) {
+        this.$router.push("/Code");
+      } else if (value == 8) {
+        this.$router.push("/Uncleic");
+      } else if (value == 9) {
+        this.$router.push("/Vaccines");
+      } else if (value == 10) {
+        this.$router.push("/address");
+      } else if (value == 11) {
+        this.$router.push("/hospital");
+      } else if (value == 12) {
+        this.$router.push("/detect");
+      }
     },
   },
 };
@@ -162,12 +243,38 @@ export default {
 }
 .main {
   padding-top: 120px;
-  .title{
+  .one,
+  .two,
+  .three,
+  .four {
+    // background: red;
+    height: 160px;
+  }
+
+  .btootm {
+    width: 100%;
+    height: 100px;
+  }
+  .title1,
+  .title2,
+  .title3,
+  .title4 {
     width: 90%;
     margin: 0 auto;
-    border-left: 5px solid rgb(116, 207, 200)
   }
-  p{
+  .title1 {
+    border-left: 5px solid rgb(116, 207, 200);
+  }
+  .title2 {
+    border-left: 5px solid rgb(255, 141, 47);
+  }
+  .title3 {
+    border-left: 5px solid rgb(67, 214, 47);
+  }
+  .title4 {
+    border-left: 5px solid rgb(66, 120, 236);
+  }
+  p {
     font-size: 16px;
     padding-left: 8px;
   }
@@ -182,16 +289,15 @@ export default {
     // margin: 8px;
     // padding: 4px;
     float: left;
-    width: 33.33333%;;
-    height: 90px;
-    p{
+    width: 33.33333%;
+    height: 115px;
+    p {
       margin-top: 5px;
     }
   }
-  img{
+  img {
     width: 60px;
     height: 60px;
-
   }
 }
 </style>
