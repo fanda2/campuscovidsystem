@@ -10,15 +10,17 @@
         </div>
         <div class="right">
           <ul>
-            <li><span>姓名：</span>{{ name }}</li>
-            <li><span>学号：</span>{{ studentNum }}</li>
-            <li><span>学院：</span>{{ college }}</li>
-            <li><span>班级：</span>{{ mygrade }}级{{ myclass }}班</li>
+            <li><span>姓名：</span>{{ usermsg.name }}</li>
+            <li><span>学号：</span>{{ usermsg.stuNo }}</li>
+            <li><span>学院：</span>{{ usermsg.faculty }}</li>
+            <li>
+              <span>班级：</span>{{ usermsg.grade }}{{ usermsg.classes }} <span v-show="userStatus==1">班</span>
+            </li>
           </ul>
         </div>
       </div>
     </div>
-    <div class="mid">
+    <div v-if="userStatus == 1" class="mid">
       <div class="inbox">
         <div class="item" @click="godetail">
           <div class="ico"><img src="../img/menu3.png" alt="" /></div>
@@ -30,13 +32,21 @@
           <div class="inmid"><span>修改密码</span></div>
           <div><span>></span></div>
         </div>
-        <div class="item">
+         <div class="item" @click="goroute">
+          <div class="ico"><img src="../img/menu4.png" alt="" /></div>
+          <div class="inmid"><span>行程上报记录</span></div>
+          <div><span>></span></div>
+        </div>
+        <div class="item" @click="goactivity">
           <div class="ico"><img src="../img/menu2.png" alt="" /></div>
-          <div class="inmid"><span>联系辅导员</span></div>
+          <div class="inmid"><span>活动申请详情</span></div>
           <div><span>></span></div>
         </div>
         <van-button type="info" block @click="unlogin">退出登录</van-button>
       </div>
+    </div>
+    <div v-if="userStatus == 0||userStatus==null" class="mider">
+      <van-button type="primary" block @click="gologin">点击登录</van-button>
     </div>
   </div>
 </template>
@@ -46,35 +56,58 @@ import { Dialog } from "vant";
 export default {
   data() {
     return {
-      name: "张三",
-      studentNum: "3120180905110",
-      college: "计算机与软件工程学院",
-      mygrade: 2018,
-      myclass: 1,
+      usermsg: {
+        name: "",
+        stuNo: "",
+      },
+      userStatus: sessionStorage.getItem("status"),
       school: "西华大学",
       show: false,
+
     };
+  },
+  created() {
+    this.GetStatus();
   },
   methods: {
     //退出登录
     unlogin() {
       Dialog.confirm({
-        title: "标题",
-        message: "弹窗内容",
+        title: "提示",
+        message: "是否退出登录",
       })
         .then(() => {
-          // on confirm
+          sessionStorage.removeItem("token");
+          sessionStorage.setItem("status", 0);
+          sessionStorage.removeItem("message");
+          this.$router.push("/tab/home");
         })
-        .catch(() => {
-          // on cancel
-        });
+        .catch(() => {});
+    },
+    gologin() {
+      this.$router.push("/login");
+    },
+    //获取检查登录状态获取用户信息
+    GetStatus() {
+      const status = sessionStorage.getItem("status");
+      if (status == 1) {
+        let msg = JSON.parse(sessionStorage.getItem("message"));
+        this.usermsg = msg;
+      }
     },
     godetail() {
       this.$router.push("/detail");
     },
+    goroute(){
+      this.$router.push({name:"routedet",params:{backroute:2}});
+    },
     gopwd() {
       this.$router.push("/changepwd");
     },
+    goactivity()
+    {
+       this.$router.push({name:"activitydet",params:{backroute:2}});
+    }
   },
 };
 </script>
@@ -130,9 +163,15 @@ export default {
     }
   }
 }
+//未登录时显示
+.mider {
+  width: 90%;
+  height: 50px;
+  margin: 200px auto;
+}
 .mid {
   width: 90%;
-  height: 320px;
+  height: 300px;
   margin: 0 auto;
   .inbox {
     height: 300px;

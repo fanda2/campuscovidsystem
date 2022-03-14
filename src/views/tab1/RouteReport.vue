@@ -6,8 +6,11 @@
       left-arrow
       @click-left="onClickLeft"
     />
+    <div class="topbtn">
+      <div @click="godetial">点击查看提交记录</div>
+    </div>
     <div class="form">
-      <van-form @submit="onSubmit">
+      <van-form>
         <van-field
           readonly
           clickable
@@ -85,27 +88,48 @@
           label="座位号"
           placeholder="请输入座位号"
         />
-
-        <!-- <van-field
+        <van-field
           readonly
           clickable
-          name="numberPicker"
-          :value="temp3"
-          label="夜间测温"
-          placeholder="点击选择温度"
-          @click="evening"
+          name="picker"
+          :value="OutTime"
+          label="行程时间"
+          placeholder="点击选择行程时间"
+          @click="dateshow = true"
         />
-        <van-popup v-model="showPicker4" position="bottom">
-          <van-picker
-            @confirm="onConfirmtemp2"
-            show-toolbar
-            title="体温选择"
-            :columns="columns2"
+        <van-popup v-model="dateshow" position="bottom">
+          <van-datetime-picker
+            v-model="currentDate2"
+            type="date"
+            :min-date="minDate"
+            :max-date="maxDate"
+            :formatter="formatter"
+            @confirm="SelectDate"
+            @cancel="dateshow = false"
           />
-        </van-popup> -->
-    
-        <div style="margin: 16px">
-          <van-button round block type="info" native-type="submit"
+        </van-popup>
+        <van-field
+          v-model="note"
+          rows="1"
+          autosize
+          label="备注"
+          type="textarea"
+          maxlength="60"
+          class="note"
+          placeholder="请填写备注"
+          show-word-limit
+        />
+        <div class="bottomnote">
+          <span>请务必根据真实情况进行填写，并且承担相应的责任</span>
+        </div>
+
+        <div class="bottombtn">
+          <van-button
+            round
+            block
+            type="info"
+            native-type="submit"
+            @click="Route"
             >提交信息</van-button
           >
         </div>
@@ -116,6 +140,8 @@
 
 <script>
 import { areaList } from "@vant/area-data";
+import { Notify } from "vant";
+import { Dialog } from "vant";
 export default {
   data() {
     return {
@@ -127,21 +153,69 @@ export default {
       OutStyle: "", // 出行方式选择
       number: "", //车排号/车次/航班号
       SetNum: "", //座位号
+      note: "", //添加备注内容
       outstyle: ["铁路列车", "客运汽车", "飞机", "网约车", "自驾", "其他"],
       areaList,
       showArea: false,
       showArea2: false,
       showStyle: false,
+      dateshow: false,
+      OutTime: "",
+      minDate: new Date(),
+      maxDate: new Date(2025, 1, 1),
+      currentDate2: new Date(),
+      loginstatus:sessionStorage.getItem('status')
     };
   },
-
+  created() {
+    this.teststatus();
+  },
   methods: {
-    onClickLeft() {
-      console.log("ddd");
-      this.$router.push("/tab/home");
+    teststatus() {
+      if (this.loginstatus == 0 ||this.loginstatus==null) {
+        Dialog.confirm({
+          title: "提示",
+          message: "现在还未登录，是否跳转到登录界面。",
+        })
+          .then(() => {
+            this.$router.push("/login");
+          })
+          .catch(() => {
+            this.$router.push("/tab/home");
+          });
+      }
     },
-    onSubmit(values) {
-      console.log("submit", values);
+    //行程报告提交
+    async Route() {
+      const result = await this.$http.post(
+        "/trip-report/insert",
+        {
+          arrivalArea: this.arriveaddress,
+          startingArea: this.startaddress,
+          note: this.note,
+          number: this.number,
+          seatNumber: this.SetNum,
+          specificDepartureArea: this.detailaddress,
+          specificDestinationArea: this.detailarrive,
+          startingWay: this.OutStyle,
+          tourDate: this.OutTime,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (result.code == 200) {
+        // 成功通知
+        Notify({ type: "success", message: "提交成功" });
+        this.$router.push("/tab/home");
+      } else {
+        Notify({ type: "warning", message: "提交信息失败，请稍后重试！" });
+      }
+    },
+    onClickLeft() {
+      this.$router.push("/tab/home");
     },
     onConfirm(values) {
       this.arriveaddress = values
@@ -161,6 +235,35 @@ export default {
       this.OutStyle = value;
       this.showStyle = false;
     },
+    //时间格式化函数
+    p(s) {
+      return s < 10 ? "0" + s : s;
+    },
+    SelectDate(time) {
+      const d = new Date(time);
+      const resDate =
+        d.getFullYear() +
+        "-" +
+        this.p(d.getMonth() + 1) +
+        "-" +
+        this.p(d.getDate());
+      this.OutTime = resDate;
+      this.dateshow = false;
+    },
+    formatter(type, value) {
+      if (type === "year") {
+        return `${value}年`;
+      } else if (type === "month") {
+        return `${value}月`;
+      } else if (type === "day") {
+        return `${value}日`;
+      }
+      return value;
+    },
+    //进入查看详情页
+    godetial() {
+      this.$router.push({ name: "routedet", params: { backroute: 1 } });
+    },
   },
 };
 </script>
@@ -175,7 +278,38 @@ export default {
   line-height: 60px;
   text-align: center;
 }
-.van-button {
+.note {
   margin-top: 20px;
+  height: 120px;
+  line-height: 20px;
+}
+.topbtn {
+  width: 100%;
+  height: 40px;
+  font-size: 14px;
+  background: rgb(89, 206, 190);
+  padding-top: 20px;
+  div {
+    width: 40%;
+    padding: 3px;
+    border-radius: 10px;
+    margin: 0px auto;
+    text-align: center;
+    background: white;
+    border: 1px solid rgb(219, 219, 219);
+  }
+}
+.bottombtn {
+  height: 100px;
+  width: 90%;
+  margin: 0 auto;
+}
+.bottomnote {
+  width: 100%;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  font-size: 12px;
+  color: rgb(221, 221, 221);
 }
 </style>

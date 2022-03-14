@@ -7,7 +7,7 @@
       @click-left="onClickLeft"
     />
     <div class="form">
-      <van-form @submit="onSubmit">
+      <van-form>
         <van-field
           readonly
           clickable
@@ -25,6 +25,7 @@
             type="date"
             :min-date="minDate"
             :max-date="maxDate"
+            :formatter="formatter"
           />
         </van-popup>
 
@@ -89,6 +90,7 @@
 
 <script>
 import { Dialog } from "vant";
+import { Notify } from "vant";
 export default {
   data() {
     return {
@@ -123,10 +125,68 @@ export default {
       temp1: "", //上午温度
       temp2: "", //下午温度
       temp3: "", //夜间温度
+      loginstatus:sessionStorage.getItem('status')
     };
   },
-
+  created() {
+    this.Gettmp();
+  },
   methods: {
+    //体温提交
+    async subtmp() {
+      const result = await this.$http.post(
+        "/body-temperature/insertBodyTemperature",
+        {
+          morning: this.temp1,
+          noon: this.temp2,
+          night: this.temp3,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (result.code == 200) {
+        // 成功通知
+        Notify({ type: "success", message: "提交成功" });
+        this.Gettmp();
+      } else {
+        Notify({ type: "warning", message: "提交信息失败，请稍后重试！" });
+      }
+    },
+    //获取用户一天的体温信息
+    async Gettmp() {
+      // 参数格式化
+      console.log("11122",this.loginstatus)
+       if (this.loginstatus == 0||this.loginstatus==null) {
+        Dialog.confirm({
+          title: "提示",
+          message: "现在还未登录，是否跳转到登录界面。",
+        })
+          .then(() => {
+            this.$router.push("/login");
+          })
+          .catch(() => {
+            this.$router.push("/tab/home");
+          });
+      }else{
+      var result = await this.$http.get(
+        "/body-temperature/getOwnCurrentBodyTemperature"
+      );
+      if (result.code == 200 && result.data != null) {
+        if (result.data.morning != 0) {
+          this.temp1 = result.data.morning;
+        }
+        if (result.data.noon != 0) {
+          this.temp2 = result.data.noon;
+        }
+        if (result.data.night != 0) {
+          this.temp3 = result.data.night;
+        }
+      }
+      }
+    },
     onClickLeft() {
       console.log("ddd");
       this.$router.push("/tab/home");
@@ -147,39 +207,61 @@ export default {
     },
     onConfirmtemp(value) {
       this.temp1 = value[0] + value[1] * 0.1;
+      this.subtmp();
       this.showPicker2 = false;
     },
     onConfirmtemp1(value) {
       this.temp2 = value[0] + value[1] * 0.1;
+      this.subtmp();
       this.showPicker3 = false;
     },
     onConfirmtemp2(value) {
       this.temp3 = value[0] + value[1] * 0.1;
+      this.subtmp();
       this.showPicker4 = false;
     },
-    onSubmit() {
-      console.log("提交");
-    },
     morning() {
-      if (this.nowdate > 0 && this.nowdate < 10) {
+      if (this.nowdate >= 0 && this.nowdate < 10 && this.temp1 =='') {
         this.showPicker2 = true;
+      } else if (this.nowdate >= 0 && this.nowdate < 10 && this.temp1 !=' ') {
+        Dialog({ message: "今日已提交" });
       } else {
         Dialog({ message: "当前时间不可提交" });
       }
     },
     afternoon() {
-      if (this.nowdate > 10 && this.nowdate < 15) {
+      if (this.nowdate >= 10 && this.nowdate < 15  && this.temp2 =='') {
         this.showPicker3 = true;
+      } else if (this.nowdate >= 10 && this.nowdate < 15 && this.temp2 != "") {
+        Dialog({ message: "今日已提交" });
       } else {
+        console.log("当hi", this.temp2);
         Dialog({ message: "当前时间不可提交" });
       }
     },
     evening() {
-      if (this.nowdate > 15 && this.nowdate < 24) {
+      if (this.nowdate >= 15 && this.nowdate < 24 && this.temp3 =='') {
         this.showPicker4 = true;
+      } else if (
+        this.nowdate >= 15 &&
+        this.nowdate < 24 &&
+        this.temp3 != null
+      ) {
+        Dialog({ message: "今日已提交" });
       } else {
         Dialog({ message: "当前时间不可提交" });
       }
+    },
+    //显示函数
+    formatter(type, value) {
+      if (type === "year") {
+        return `${value}年`;
+      } else if (type === "month") {
+        return `${value}月`;
+      } else if (type === "day") {
+        return `${value}日`;
+      }
+      return value;
     },
   },
 };

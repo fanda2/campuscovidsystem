@@ -28,7 +28,7 @@
         </div>
       </div>
       <div class="mbottom">
-        <span> 数据截止{{ time }}，数据来源于四川省人民政府官网 </span>
+        <span> 数据截止{{  datatime }}，数据来源于四川省人民政府官网 </span>
       </div>
     </div>
     <div class="main">
@@ -49,7 +49,7 @@
           </li>
         </ul>
       </div>
-      <div class="two">
+      <div class="two" v-show="userStatus == 1">
         <div class="title2"><p>活动申请</p></div>
         <ul>
           <li>
@@ -57,7 +57,7 @@
             <p>返校申请</p>
           </li>
           <li>
-            <img src="../img/ico22.png" alt="" @click="btn(5)"/>
+            <img src="../img/ico22.png" alt="" @click="btn(5)" />
             <p>外出申请</p>
           </li>
           <li>
@@ -66,7 +66,7 @@
           </li>
         </ul>
       </div>
-      <div class="three">
+      <div class="three" v-show="userStatus == 1">
         <div class="title3"><p>问卷调查</p></div>
         <ul>
           <li>
@@ -108,16 +108,30 @@
 export default {
   data() {
     return {
-      username: "张三",
-      time: "2000.03.09",
-      diagnosed: 100,
-      cure: 50,
+      username: "",
+      datatime: "",
+      diagnosed: 154,
+      cure: 1403,
       died: 3,
+      userStatus: sessionStorage.getItem("status"), //用户登录状态，代表未登录，1代表已经登录
     };
+  },
+
+  created() {
+    this.GetStatus();
+    this.getTodayCourse();
   },
   methods: {
     gomap() {
       this.$router.push("/covmap");
+    },
+    //获取检查登录状态获取用户信息
+    GetStatus() {
+      const status = sessionStorage.getItem("status");
+      if (status == 1) {
+        let msg = JSON.parse(sessionStorage.getItem("message"));
+        this.username = msg.name;
+      }
     },
     btn(value) {
       if (value == 1) {
@@ -128,8 +142,8 @@ export default {
         this.$router.push("/Reporter");
       } else if (value == 4) {
         this.$router.push("/BackSchool");
-    } else if (value == 5) {
-        this.$router.push("/Out");
+      } else if (value == 5) {
+        this.$router.push("/outview");
       } else if (value == 6) {
         this.$router.push("/Activity");
       } else if (value == 7) {
@@ -145,6 +159,25 @@ export default {
       } else if (value == 12) {
         this.$router.push("/detect");
       }
+    },
+    getTodayCourse() {
+      var myDate = new Date();
+      //获取当前年
+      var year = myDate.getFullYear();
+      //获取当前月
+      var month = myDate.getMonth() + 1;
+      //获取当前日
+      var date = myDate.getDate();
+      this.datatime =
+        year +
+        "." +
+        this.p(month) +
+        "." +
+        this.p(date) ;
+    },
+
+    p(s) {
+      return s < 10 ? "0" + s : s;
     },
   },
 };

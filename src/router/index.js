@@ -69,6 +69,11 @@ const routes = [{
             import ("../views/tab2/Out.vue"),
     },
     {
+        path: "/outview",
+        component: () =>
+            import ("../views/tab2/Outview.vue"),
+    },
+    {
         path: "/Activity",
         component: () =>
             import ("../views/tab2/SchoolActivity.vue"),
@@ -113,6 +118,18 @@ const routes = [{
         component: () =>
             import ("../views/ChangePwd.vue"),
     },
+    {
+        path: "/routedet",
+        name: "routedet",
+        component: () =>
+            import ("../views/tab1/DetialRoute.vue"),
+    },
+    {
+        path: "/activitydet",
+        name: 'activitydet',
+        component: () =>
+            import ("../views/tab2/Actdetial.vue"),
+    }
 ];
 
 const router = new VueRouter({

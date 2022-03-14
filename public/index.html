@@ -1,17 +1,28 @@
 <!DOCTYPE html>
 <html lang="">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title><%= htmlWebpackPlugin.options.title %></title>
-  </head>
-  <body>
+    <script src="https://map.qq.com/api/gljs?v=1.exp&key=OHUBZ-OV3CK-YS5JH-AGVIK-EILPF-XFBPG"></script>
+    <script type="text/javascript" src="https://3gimg.qq.com/lightmap/components/geolocation/geolocation.min.js"></script>
+    <script src="https://apis.map.qq.com/ws/geocoder/v1/callback=renderReverse&location=39.984154,116.307490&get_poi=0&key=OHUBZ-OV3CK-YS5JH-AGVIK-EILPF-XFBPG"></script>
+    <script src="https://apis.map.qq.com/ws/geocoder/v1/?address=北京市海淀区彩和坊路海淀西大街74号&key=OHUBZ-OV3CK-YS5JH-AGVIK-EILPF-XFBPG&callback=showLocation"></script>
+    <title>
+        校园疫情防控服务系统
+    </title>
+</head>
+
+<body>
+
     <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>  
     </noscript>
     <div id="app"></div>
+    <div id="map"></div>
     <!-- built files will be auto injected -->
-  </body>
+</body>
+
 </html>

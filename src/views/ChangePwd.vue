@@ -39,7 +39,7 @@
             block
             type="info"
             native-type="submit"
-            @click="onsubmit"
+            @click="fixpassword"
             >提交</van-button
           >
         </div>
@@ -49,14 +49,10 @@
 </template>
 
 <script>
+import { Notify } from "vant";
 export default {
   data() {
     return {
-      user: {
-        usertype: "学生",
-        suername: "张三",
-        studentNum: "3120180905110",
-      },
       value: "",
       oldpwd: "",
       pwd1: "",
@@ -67,13 +63,27 @@ export default {
     onClickLeft() {
       this.$router.push("/tab/myinfo");
     },
-    onsubmit() {
-      if (this.oldpwd == "" && this.pwd1 == "" && this.pwd2 == "") {
-        console.log("提交为空");
-      } else {
-        console.log("输入不为空");
+    //修改密码
+    async fixpassword(){
+      if(this.pwd1==this.pwd2)
+      {  
+        var params = new URLSearchParams();
+      params.append("oldPassword", this.oldpwd);
+      params.append("newPassword", this.pwd1);
+        var result = await this.$http.post("/user/resetPassword",params);
+        if(result.code==200)
+        {
+             Notify({ type: "success", message: "修改密码成功！请重新登录" });
+              this.$router.push('/login')
+        }
+        else{
+            Notify({ type: "warning", message: "修改失败，原密码错误或网络问题！" });
+        }
       }
-    },
+      else{
+              Notify({ type: "warning", message: "两次密码输入不相同！" });
+      }
+    }
   },
 };
 </script>
